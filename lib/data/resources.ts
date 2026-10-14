@@ -19,3 +19,11 @@ export function getResources({ q, type }: ResourceFilters = {}) {
 export function getResourceById(id: number) {
   return prisma.resource.findUnique({ where: { id } });
 }
+
+export function getActiveResources() {
+  return prisma.resource.findMany({
+    where: { isActive: true },
+    orderBy: { name: "asc" },
+    select: { id: true, name: true },
+  });
+}
