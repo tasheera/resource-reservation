@@ -1,11 +1,20 @@
 import { getResources } from "@/lib/data/resources";
+import { RESOURCE_TYPES } from "@/lib/lib/validations";
 import Link from "next/link";
 import { setResourceActive } from "./actions";
 
 export const instant = false;
 
-export default async function ResourcesPage() {
-  const resources = await getResources();
+export default async function ResourcesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; type?: string }>;
+}) {
+  const { q, type } = await searchParams;
+
+  const validType = RESOURCE_TYPES.find((t) => t === type);
+
+  const resources = await getResources({ q: q?.trim(), type: validType });
 
   return (
     <main className="min-h-screen bg-[#0a0a0a] px-6 py-10 text-zinc-100 lg:px-10">
@@ -17,6 +26,32 @@ export default async function ResourcesPage() {
             + Add resource
           </Link>
         </div>
+        <form action="/resources" method="get" className="mb-4 flex gap-2">
+          <input
+            name="q"
+            defaultValue={q}
+            placeholder="Search by name..."
+            className="rounded border border-gray-300 px-3 py-2"
+          />
+          <select
+            name="type"
+            defaultValue={validType ?? ""}
+            className="rounded border border-gray-300 px-3 py-2"
+          >
+            <option value="">All types</option>
+            {RESOURCE_TYPES.map((t) => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </select>
+          <button type="submit" className="rounded border px-4 py-2">
+            Filter
+          </button>
+          {(q || validType) && (
+            <Link href="/resources" className="px-2 py-2 text-gray-600 underline">
+              Clear
+            </Link>
+          )}
+        </form>
         {resources.length === 0 ? (
           <p className="border border-dashed border-zinc-700 px-5 py-8 text-zinc-500">No resources yet.</p>
         ) : (
