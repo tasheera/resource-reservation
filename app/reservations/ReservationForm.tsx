@@ -20,6 +20,11 @@ export default function ReservationForm({ action, resources }: Props) {
 
   return (
     <form action={formAction} className="max-w-lg space-y-4">
+      {state?.formError && (
+        <div className="rounded border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700">
+          {state.formError}
+        </div>
+      )}
       <div>
         <label className="block text-sm font-medium">Resource *</label>
         <select name="resourceId" defaultValue={value("resourceId")} className={inputClass} required>
