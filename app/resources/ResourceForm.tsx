@@ -1,30 +1,35 @@
 "use client";
 
 import { useActionState } from "react";
+import type { Resource } from "@prisma/client";
 import type { FormState } from "./actions";
 import { RESOURCE_TYPES } from "@/lib/lib/validations";
 
 type Props = {
   action: (prev: FormState, formData: FormData) => Promise<FormState>;
+  resource?: Resource;
 };
 
 const inputClass = "w-full rounded border border-gray-300 px-3 py-2";
 
-export default function ResourceForm({ action }: Props) {
+export default function ResourceForm({ action, resource }: Props) {
   const [state, formAction, pending] = useActionState(action, undefined);
   const error = (field: string) => state?.errors?.[field]?.[0];
+
+  const value = (field: string, saved: string | number | null | undefined, fallback = "") =>
+    state?.values?.[field] ?? saved ?? fallback;
 
   return (
     <form action={formAction} className="max-w-lg space-y-4">
       <div>
         <label className="block text-sm font-medium">Name *</label>
-        <input name="name" className={inputClass} />
+        <input name="name" defaultValue={value("name", resource?.name)} className={inputClass} />
         {error("name") && <p className="text-sm text-red-600">{error("name")}</p>}
       </div>
 
       <div>
         <label className="block text-sm font-medium">Type *</label>
-        <select name="type" defaultValue="ROOM" className={inputClass}>
+        <select name="type" defaultValue={value("type", resource?.type, "ROOM")} className={inputClass}>
           {RESOURCE_TYPES.map((t) => (
             <option key={t} value={t}>{t}</option>
           ))}
@@ -33,18 +38,18 @@ export default function ResourceForm({ action }: Props) {
 
       <div>
         <label className="block text-sm font-medium">Location</label>
-        <input name="location" className={inputClass} />
+        <input name="location" defaultValue={value("location", resource?.location)} className={inputClass} />
       </div>
 
       <div>
         <label className="block text-sm font-medium">Capacity</label>
-        <input name="capacity" type="number" className={inputClass} />
+        <input name="capacity" type="number" defaultValue={value("capacity", resource?.capacity)} className={inputClass} />
         {error("capacity") && <p className="text-sm text-red-600">{error("capacity")}</p>}
       </div>
 
       <div>
         <label className="block text-sm font-medium">Description</label>
-        <textarea name="description" rows={3} className={inputClass} />
+        <textarea name="description" rows={3} defaultValue={value("description", resource?.description)} className={inputClass} />
       </div>
 
       <button
