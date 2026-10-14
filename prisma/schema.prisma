@@ -1,0 +1,51 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ReservationStatus {
+  CONFIRMED
+  CANCELLED
+}
+
+model Resource {
+  id           Int           @id @default(autoincrement())
+  name         String
+  type         String
+  location     String?
+  capacity     Int?
+  description  String?
+  isActive     Boolean       @default(true)
+  createdAt    DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime      @updatedAt @db.Timestamptz(3)
+  reservations Reservation[]
+
+  @@index([type])
+}
+
+model Reservation {
+  id            Int               @id @default(autoincrement())
+  resourceId    Int
+  resource      Resource          @relation(fields: [resourceId], references: [id])
+  bookedByName  String
+  bookedByEmail String
+  purpose       String
+  startTime     DateTime          @db.Timestamptz(3)
+  endTime       DateTime          @db.Timestamptz(3)
+  status        ReservationStatus @default(CONFIRMED)
+  createdAt     DateTime          @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime          @updatedAt @db.Timestamptz(3)
+
+  @@index([resourceId, startTime, endTime])
+  @@index([startTime])
+}
