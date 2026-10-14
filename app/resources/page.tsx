@@ -28,6 +28,7 @@ export default async function ResourcesPage() {
                   <th>Location</th>
                   <th>Capacity</th>
                   <th>Status</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
@@ -39,6 +40,11 @@ export default async function ResourcesPage() {
                     <td>{r.capacity ?? "-"}</td>
                     <td className={r.isActive ? "text-emerald-400" : "text-zinc-600"}>
                       {r.isActive ? "Active" : "Inactive"}
+                    </td>
+                    <td>
+                      <Link href={`/resources/${r.id}/edit`} className="text-blue-600">
+                        Edit
+                      </Link>
                     </td>
                   </tr>
                 ))}
