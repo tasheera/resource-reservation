@@ -7,3 +7,26 @@ export function getReservations() {
     orderBy: { startTime: "desc" },
   });
 }
+
+export function getConfirmedReservationsForDay(
+  resourceId: number,
+  dayStart: Date,
+  dayEnd: Date
+) {
+  return prisma.reservation.findMany({
+    where: {
+      resourceId,
+      status: "CONFIRMED",
+      startTime: { lt: dayEnd },
+      endTime: { gt: dayStart },
+    },
+    orderBy: { startTime: "asc" },
+    select: {
+      id: true,
+      bookedByName: true,
+      purpose: true,
+      startTime: true,
+      endTime: true,
+    },
+  });
+}
