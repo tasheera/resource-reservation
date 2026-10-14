@@ -1,5 +1,6 @@
 import { getResources } from "@/lib/data/resources";
 import Link from "next/link";
+import { setResourceActive } from "./actions";
 
 export const instant = false;
 
@@ -38,13 +39,20 @@ export default async function ResourcesPage() {
                     <td>{r.type}</td>
                     <td>{r.location ?? "-"}</td>
                     <td>{r.capacity ?? "-"}</td>
-                    <td className={r.isActive ? "text-emerald-400" : "text-zinc-600"}>
-                      {r.isActive ? "Active" : "Inactive"}
-                    </td>
                     <td>
+                      <span className={r.isActive ? "text-green-700" : "text-gray-400"}>
+                        {r.isActive ? "Active" : "Inactive"}
+                      </span>
+                    </td>
+                    <td className="flex gap-3 py-2">
                       <Link href={`/resources/${r.id}/edit`} className="text-blue-600">
                         Edit
                       </Link>
+                      <form action={setResourceActive.bind(null, r.id, !r.isActive)}>
+                        <button type="submit" className="text-gray-600 underline">
+                          {r.isActive ? "Deactivate" : "Activate"}
+                        </button>
+                      </form>
                     </td>
                   </tr>
                 ))}
