@@ -1,4 +1,5 @@
 import { getResources } from "@/lib/data/resources";
+import Link from "next/link";
 
 export const instant = false;
 
@@ -9,8 +10,12 @@ export default async function ResourcesPage() {
     <main className="min-h-screen bg-[#0a0a0a] px-6 py-10 text-zinc-100 lg:px-10">
       <div className="mx-auto max-w-5xl">
         <p className="mb-3 font-mono text-xs tracking-[0.2em] text-yellow-300">RESERVE / 01</p>
-        <h1 className="mb-8 text-4xl font-semibold tracking-tight">Available resources</h1>
-
+        <div className="mb-4 flex items-center justify-between">
+          <h1 className="text-2xl font-bold">Resources</h1>
+          <Link href="/resources/new" className="rounded bg-green-600 px-4 py-2 text-white">
+            + Add resource
+          </Link>
+        </div>
         {resources.length === 0 ? (
           <p className="border border-dashed border-zinc-700 px-5 py-8 text-zinc-500">No resources yet.</p>
         ) : (
