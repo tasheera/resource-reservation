@@ -48,7 +48,12 @@ export default async function ReservationsPage({
           <h1 className="text-2xl font-bold">Reservations</h1>
         </div>
 
-        <form action="/reservations" method="get" className="mb-4 flex flex-wrap gap-2">
+        <form
+          key={`${resourceId ?? ""}-${status ?? ""}`}
+          action="/reservations"
+          method="get"
+          className="mb-4 flex flex-wrap gap-2"
+        >
           <select
             name="resourceId"
             defaultValue={resourceId ?? ""}
@@ -101,9 +106,8 @@ export default async function ReservationsPage({
                   {items.map((b) => (
                     <tr
                       key={b.id}
-                      className={`border-b border-gray-200 last:border-0 hover:bg-gray-50 ${
-                        b.status === "CANCELLED" ? "text-gray-400" : ""
-                      }`}
+                      className={`border-b border-gray-200 last:border-0 hover:bg-gray-50 ${b.status === "CANCELLED" ? "text-gray-400" : ""
+                        }`}
                     >
                       <td className="px-5 py-4 font-medium">{b.resource.name}</td>
                       <td className="py-4">
