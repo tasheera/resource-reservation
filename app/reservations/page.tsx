@@ -1,5 +1,6 @@
 import { getReservations } from "@/lib/data/reservations";
 import { formatDateTime } from "@/lib/format";
+import Link from "next/link";
 
 export const instant = false;
 
@@ -9,8 +10,12 @@ export default async function ReservationsPage() {
 
   return (
     <div className="mx-auto max-w-5xl p-6">
-      <h1 className="mb-4 text-2xl font-bold">Reservations</h1>
-
+      <div className="mb-4 flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Reservations</h1>
+        <Link href="/reservations/new" className="rounded bg-green-600 px-4 py-2 text-white">
+          + New reservation
+        </Link>
+      </div>
       {reservations.length === 0 ? (
         <p className="text-gray-500">No reservations yet.</p>
       ) : (
