@@ -34,6 +34,7 @@ export default async function ResourcesPage({
             className="rounded border border-gray-300 px-3 py-2"
           />
           <select
+            key={validType ?? ""}
             name="type"
             defaultValue={validType ?? ""}
             className="rounded border border-gray-300 px-3 py-2"
