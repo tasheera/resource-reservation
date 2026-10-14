@@ -32,6 +32,22 @@ export async function createReservation(
   const { resourceId, bookedByName, bookedByEmail, purpose, startTime, endTime } =
     parsed.data;
 
+  const resource = await prisma.resource.findUnique({
+    where: { id: resourceId },
+    select: { isActive: true },
+  });
+
+  if (!resource || !resource.isActive) {
+    return {
+      errors: {
+        resourceId: [
+          resource ? "This resource is inactive and can't be booked." : "Resource not found.",
+        ],
+      },
+      values: raw as Record<string, string>,
+    };
+  }
+
   try {
     await prisma.reservation.create({
       data: {
