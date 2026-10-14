@@ -65,3 +65,12 @@ export async function updateResource(
   revalidatePath("/resources");
   redirect("/resources");
 }
+
+export async function setResourceActive(id: number, isActive: boolean) {
+  await prisma.resource.updateMany({
+    where: { id },
+    data: { isActive },
+  });
+
+  revalidatePath("/resources");
+}
