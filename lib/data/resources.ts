@@ -27,3 +27,25 @@ export function getActiveResources() {
     select: { id: true, name: true },
   });
 }
+
+export async function getResourceUsage() {
+  const resources = await prisma.resource.findMany({
+    select: {
+      id: true,
+      name: true,
+      isActive: true,
+      _count: {
+        select: { reservations: { where: { status: "CONFIRMED" } } },
+      },
+    },
+  });
+
+  return resources
+    .map((r) => ({
+      id: r.id,
+      name: r.name,
+      isActive: r.isActive,
+      bookings: r._count.reservations,
+    }))
+    .sort((a, b) => b.bookings - a.bookings || a.name.localeCompare(b.name));
+}
