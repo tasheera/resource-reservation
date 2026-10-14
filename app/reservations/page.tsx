@@ -1,13 +1,44 @@
-import { getReservations } from "@/lib/data/reservations";
-import { formatDateTime } from "@/lib/format";
 import Link from "next/link";
+import { getReservations, PAGE_SIZE } from "@/lib/data/reservations";
+import { getResources } from "@/lib/data/resources";
+import { formatDateTime } from "@/lib/format";
 import { cancelReservation } from "./actions";
+
+const STATUSES = ["CONFIRMED", "CANCELLED"] as const;
 
 export const instant = false;
 
+export default async function ReservationsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ resourceId?: string; status?: string; page?: string }>;
+}) {
+  const params = await searchParams;
+  const resources = await getResources();
 
-export default async function ReservationsPage() {
-  const reservations = await getReservations();
+  const resourceId = resources.find((r) => r.id === Number(params.resourceId))?.id;
+  const status = STATUSES.find((s) => s === params.status);
+  const requestedPage = Number.parseInt(params.page ?? "1", 10);
+
+  const { items, total, totalPages, currentPage } = await getReservations({
+    resourceId,
+    status,
+    page: Number.isNaN(requestedPage) ? 1 : requestedPage,
+  });
+
+  const filtersActive = Boolean(resourceId || status);
+
+  const pageHref = (p: number) => {
+    const query = new URLSearchParams();
+    if (resourceId) query.set("resourceId", String(resourceId));
+    if (status) query.set("status", status);
+    if (p > 1) query.set("page", String(p));
+    const qs = query.toString();
+    return qs ? `/reservations?${qs}` : "/reservations";
+  };
+
+  const from = (currentPage - 1) * PAGE_SIZE + 1;
+  const to = from + items.length - 1;
 
   return (
     <div className="mx-auto max-w-5xl p-6">
@@ -17,49 +48,107 @@ export default async function ReservationsPage() {
           + New reservation
         </Link>
       </div>
-      {reservations.length === 0 ? (
-        <p className="text-gray-500">No reservations yet.</p>
+
+      <form action="/reservations" method="get" className="mb-4 flex gap-2">
+        <select
+          name="resourceId"
+          defaultValue={resourceId ?? ""}
+          className="rounded border border-gray-300 px-3 py-2"
+        >
+          <option value="">All resources</option>
+          {resources.map((r) => (
+            <option key={r.id} value={r.id}>{r.name}</option>
+          ))}
+        </select>
+        <select
+          name="status"
+          defaultValue={status ?? ""}
+          className="rounded border border-gray-300 px-3 py-2"
+        >
+          <option value="">All statuses</option>
+          <option value="CONFIRMED">Confirmed</option>
+          <option value="CANCELLED">Cancelled</option>
+        </select>
+        <button type="submit" className="rounded border px-4 py-2">
+          Filter
+        </button>
+        {filtersActive && (
+          <Link href="/reservations" className="px-2 py-2 text-gray-600 underline">
+            Clear
+          </Link>
+        )}
+      </form>
+
+      {items.length === 0 ? (
+        <p className="text-gray-500">
+          {filtersActive ? "No reservations match your filters." : "No reservations yet."}
+        </p>
       ) : (
-        <table className="w-full text-left text-sm">
-          <thead className="border-b font-medium">
-            <tr>
-              <th className="py-2">Resource</th>
-              <th>Booked by</th>
-              <th>Purpose</th>
-              <th>Start</th>
-              <th>End</th>
-              <th>Status</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {reservations.map((b) => (
-              <tr
-                key={b.id}
-                className={`border-b ${b.status === "CANCELLED" ? "text-gray-400" : ""}`}
-              >
-                <td className="py-2 font-medium">{b.resource.name}</td>
-                <td>
-                  {b.bookedByName}
-                  <div className="text-xs text-gray-500">{b.bookedByEmail}</div>
-                </td>
-                <td>{b.purpose}</td>
-                <td>{formatDateTime(b.startTime)}</td>
-                <td>{formatDateTime(b.endTime)}</td>
-                <td>{b.status === "CONFIRMED" ? "Confirmed" : "Cancelled"}</td>
-                <td>
-                  {b.status === "CONFIRMED" && (
-                    <form action={cancelReservation.bind(null, b.id)}>
-                      <button type="submit" className="text-red-600 underline">
-                        Cancel
-                      </button>
-                    </form>
-                  )}
-                </td>
+        <>
+          <table className="w-full text-left text-sm">
+            <thead className="border-b font-medium">
+              <tr>
+                <th className="py-2">Resource</th>
+                <th>Booked by</th>
+                <th>Purpose</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Status</th>
+                <th></th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {items.map((b) => (
+                <tr
+                  key={b.id}
+                  className={`border-b ${b.status === "CANCELLED" ? "text-gray-400" : ""}`}
+                >
+                  <td className="py-2 font-medium">{b.resource.name}</td>
+                  <td>
+                    {b.bookedByName}
+                    <div className="text-xs text-gray-500">{b.bookedByEmail}</div>
+                  </td>
+                  <td>{b.purpose}</td>
+                  <td>{formatDateTime(b.startTime)}</td>
+                  <td>{formatDateTime(b.endTime)}</td>
+                  <td>{b.status === "CONFIRMED" ? "Confirmed" : "Cancelled"}</td>
+                  <td>
+                    {b.status === "CONFIRMED" && (
+                      <form action={cancelReservation.bind(null, b.id)}>
+                        <button type="submit" className="text-red-600 underline">
+                          Cancel
+                        </button>
+                      </form>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <div className="mt-4 flex items-center justify-between text-sm">
+            <span className="text-gray-600">
+              Showing {from}&ndash;{to} of {total}
+            </span>
+            <div className="flex items-center gap-4">
+              {currentPage > 1 ? (
+                <Link href={pageHref(currentPage - 1)} className="text-blue-600">
+                  &larr; Previous
+                </Link>
+              ) : (
+                <span className="text-gray-300">&larr; Previous</span>
+              )}
+              <span>Page {currentPage} of {totalPages}</span>
+              {currentPage < totalPages ? (
+                <Link href={pageHref(currentPage + 1)} className="text-blue-600">
+                  Next &rarr;
+                </Link>
+              ) : (
+                <span className="text-gray-300">Next &rarr;</span>
+              )}
+            </div>
+          </div>
+        </>
       )}
     </div>
   );
