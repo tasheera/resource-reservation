@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 import type { Resource } from "@prisma/client";
 import type { FormState } from "./actions";
-import { RESOURCE_TYPES } from "@/lib/lib/validations";
+import { RESOURCE_TYPES } from "@/lib/validations";
 
 type Props = {
   action: (prev: FormState, formData: FormData) => Promise<FormState>;

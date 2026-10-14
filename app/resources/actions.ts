@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { resourceSchema } from "@/lib/lib/validations";
+import { resourceSchema } from "@/lib/validations";
 
 export type FormState =
   | {

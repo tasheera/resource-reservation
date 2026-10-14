@@ -1,5 +1,5 @@
 import { getResources } from "@/lib/data/resources";
-import { RESOURCE_TYPES } from "@/lib/lib/validations";
+import { RESOURCE_TYPES } from "@/lib/validations";
 import Link from "next/link";
 import { setResourceActive } from "./actions";
 
