@@ -17,11 +17,16 @@ export const resourceSchema = z.object({
 
 const validDateTime = (v: string) => !Number.isNaN(parseLocalDateTime(v).getTime());
 
-export const reservationSchema = z.object({
-  resourceId: z.coerce.number().int().positive("Pick a resource"),
-  bookedByName: z.string().trim().min(1, "Name is required").max(100),
-  bookedByEmail: z.string().trim().email("Enter a valid email").max(200),
-  purpose: z.string().trim().min(1, "Purpose is required").max(300),
-  startTime: z.string().min(1, "Start time is required").refine(validDateTime, "Invalid date"),
-  endTime: z.string().min(1, "End time is required").refine(validDateTime, "Invalid date"),
-});
+export const reservationSchema = z
+  .object({
+    resourceId: z.coerce.number().int().positive("Pick a resource"),
+    bookedByName: z.string().trim().min(1, "Name is required").max(100),
+    bookedByEmail: z.string().trim().email("Enter a valid email").max(200),
+    purpose: z.string().trim().min(1, "Purpose is required").max(300),
+    startTime: z.string().min(1, "Start time is required").refine(validDateTime, "Invalid date"),
+    endTime: z.string().min(1, "End time is required").refine(validDateTime, "Invalid date"),
+  })
+  .refine(
+    (d) => parseLocalDateTime(d.endTime) > parseLocalDateTime(d.startTime),
+    { message: "End time must be after start time", path: ["endTime"] }
+  );
