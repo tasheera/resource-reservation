@@ -15,3 +15,7 @@ export function getResources({ q, type }: ResourceFilters = {}) {
     orderBy: { name: "asc" },
   });
 }
+
+export function getResourceById(id: number) {
+  return prisma.resource.findUnique({ where: { id } });
+}
