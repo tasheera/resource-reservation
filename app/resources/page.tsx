@@ -80,15 +80,17 @@ export default async function ResourcesPage({
                         {r.isActive ? "Active" : "Inactive"}
                       </span>
                     </td>
-                    <td className="flex gap-3 py-2">
-                      <Link href={`/resources/${r.id}/edit`} className="text-blue-600">
-                        Edit
-                      </Link>
-                      <form action={setResourceActive.bind(null, r.id, !r.isActive)}>
-                        <button type="submit" className="text-gray-600 underline">
-                          {r.isActive ? "Deactivate" : "Activate"}
-                        </button>
-                      </form>
+                    <td className="py-4 align-middle">
+                      <div className="flex items-center gap-3">
+                        <Link href={`/resources/${r.id}/edit`} className="text-blue-600">
+                          Edit
+                        </Link>
+                        <form action={setResourceActive.bind(null, r.id, !r.isActive)}>
+                          <button type="submit" className="cursor-pointer text-gray-600 underline">
+                            {r.isActive ? "Deactivate" : "Activate"}
+                          </button>
+                        </form>
+                      </div>
                     </td>
                   </tr>
                 ))}
