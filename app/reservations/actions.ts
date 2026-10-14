@@ -57,3 +57,12 @@ export async function createReservation(
   revalidatePath("/reservations");
   redirect("/reservations");
 }
+
+export async function cancelReservation(id: number) {
+  await prisma.reservation.updateMany({
+    where: { id, status: "CONFIRMED" },
+    data: { status: "CANCELLED" },
+  });
+
+  revalidatePath("/reservations");
+}
