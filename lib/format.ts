@@ -9,3 +9,9 @@ const dateTimeFormat = new Intl.DateTimeFormat("en-GB", {
 export function formatDateTime(date: Date) {
   return dateTimeFormat.format(date);
 }
+
+const APP_UTC_OFFSET = "+05:30";
+
+export function parseLocalDateTime(value: string) {
+  return new Date(`${value}${APP_UTC_OFFSET}`);
+}
