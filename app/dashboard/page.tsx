@@ -20,9 +20,6 @@ export default async function DashboardPage() {
             <section>
                 <div className="mb-3 flex items-center justify-between">
                     <h2 className="text-lg font-semibold">Upcoming reservations</h2>
-                    <Link href="/reservations" className="text-sm text-blue-600">
-                        View all &rarr;
-                    </Link>
                 </div>
 
                 {upcoming.length === 0 ? (

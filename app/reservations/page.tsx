@@ -44,9 +44,7 @@ export default async function ReservationsPage({
     <div className="mx-auto max-w-5xl p-6">
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Reservations</h1>
-        <Link href="/reservations/new" className="rounded bg-green-600 px-4 py-2 text-white">
-          + New reservation
-        </Link>
+ 
       </div>
 
       <form action="/reservations" method="get" className="mb-4 flex gap-2">
