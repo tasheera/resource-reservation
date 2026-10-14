@@ -6,22 +6,29 @@ import { prisma } from "@/lib/prisma";
 import { resourceSchema } from "@/lib/lib/validations";
 
 export type FormState =
-  | { errors?: Record<string, string[] | undefined> }
+  | {
+    errors?: Record<string, string[] | undefined>;
+    values?: Record<string, string>;
+  }
   | undefined;
 
-export async function createResource(
-  _prev: FormState,
-  formData: FormData
-): Promise<FormState> {
-  const parsed = resourceSchema.safeParse(Object.fromEntries(formData));
+function parseResource(formData: FormData) {
+  const raw = Object.fromEntries(formData);
+  const parsed = resourceSchema.safeParse(raw);
 
   if (!parsed.success) {
-    return { errors: parsed.error.flatten().fieldErrors };
+    return {
+      ok: false as const,
+      state: {
+        errors: parsed.error.flatten().fieldErrors,
+        values: raw as Record<string, string>,
+      },
+    };
   }
 
   const { name, type, location, capacity, description } = parsed.data;
-
-  await prisma.resource.create({
+  return {
+    ok: true as const,
     data: {
       name,
       type,
@@ -29,7 +36,31 @@ export async function createResource(
       location: location || null,
       description: description || null,
     },
-  });
+  };
+}
+
+export async function createResource(
+  _prev: FormState,
+  formData: FormData
+): Promise<FormState> {
+  const result = parseResource(formData);
+  if (!result.ok) return result.state;
+
+  await prisma.resource.create({ data: result.data });
+
+  revalidatePath("/resources");
+  redirect("/resources");
+}
+
+export async function updateResource(
+  id: number,
+  _prev: FormState,
+  formData: FormData
+): Promise<FormState> {
+  const result = parseResource(formData);
+  if (!result.ok) return result.state;
+
+  await prisma.resource.update({ where: { id }, data: result.data });
 
   revalidatePath("/resources");
   redirect("/resources");
