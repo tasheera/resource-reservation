@@ -30,3 +30,15 @@ export function getConfirmedReservationsForDay(
     },
   });
 }
+
+export function getUpcomingReservations(limit = 10) {
+  return prisma.reservation.findMany({
+    where: {
+      status: "CONFIRMED",
+      endTime: { gt: new Date() },
+    },
+    orderBy: { startTime: "asc" },
+    take: limit,
+    include: { resource: { select: { name: true } } },
+  });
+}
