@@ -19,7 +19,6 @@ export default async function ResourcesPage({
   return (
     <main className="min-h-screen px-6 py-10 lg:px-10">
       <div className="mx-auto max-w-5xl">
-        <p className="mb-3 font-mono text-xs tracking-[0.2em] text-yellow-300">RESERVE / 01</p>
         <div className="mb-4 flex items-center justify-between">
           <h1 className="text-2xl font-bold">Resources</h1>
           <Link href="/resources/new" className="rounded bg-green-600 px-4 py-2 text-white">
