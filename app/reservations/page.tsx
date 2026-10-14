@@ -1,6 +1,7 @@
 import { getReservations } from "@/lib/data/reservations";
 import { formatDateTime } from "@/lib/format";
 import Link from "next/link";
+import { cancelReservation } from "./actions";
 
 export const instant = false;
 
@@ -28,6 +29,7 @@ export default async function ReservationsPage() {
               <th>Start</th>
               <th>End</th>
               <th>Status</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -45,6 +47,15 @@ export default async function ReservationsPage() {
                 <td>{formatDateTime(b.startTime)}</td>
                 <td>{formatDateTime(b.endTime)}</td>
                 <td>{b.status === "CONFIRMED" ? "Confirmed" : "Cancelled"}</td>
+                <td>
+                  {b.status === "CONFIRMED" && (
+                    <form action={cancelReservation.bind(null, b.id)}>
+                      <button type="submit" className="text-red-600 underline">
+                        Cancel
+                      </button>
+                    </form>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
